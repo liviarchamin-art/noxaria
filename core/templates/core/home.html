@@ -1,0 +1,146 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noxaria | Personal AI</title>
+    <link rel="stylesheet" href="{% static 'core/style.css' %}">
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-icon">N</span>
+                <div>
+                    <h2>NOXARIA</h2>
+                    <small>PERSONAL INTELLIGENCE</small>
+                </div>
+            </div>
+
+            <p class="section-label">WORKSPACE</p>
+            <button class="nav-item active">◈ &nbsp; Assistant</button>
+            <button class="nav-item">⌘ &nbsp; Applications</button>
+            <button class="nav-item">▤ &nbsp; File Manager</button>
+            <button class="nav-item">◷ &nbsp; Activity Monitor</button>
+            <button class="nav-item">⚙ &nbsp; Settings</button>
+
+            <div class="sidebar-bottom">
+                <span class="status-dot"></span>
+                Local interface online
+                <small>NOXARIA · BUILD 0.1</small>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">PERSONAL ASSISTANT / HOME</p>
+                    <h1>Command Center</h1>
+                </div>
+                <div class="system-status">
+                    <span class="status-dot"></span>
+                    SYSTEM READY
+                </div>
+            </header>
+
+            <section class="welcome">
+                <p class="eyebrow">YOUR SPACE. YOUR INTELLIGENCE.</p>
+                <h2>Good to have you here.</h2>
+                <p>
+                    Your personal assistant is taking shape.
+                    What would you like to work on?
+                </p>
+            </section>
+
+            <section class="status-grid">
+                <article class="status-card">
+                    <span class="card-label">CORE SYSTEM</span>
+                    <h3>Operational</h3>
+                    <p>Django backend responding</p>
+                </article>
+
+                <article class="status-card">
+                    <span class="card-label">AI ENGINE</span>
+                    <h3>Not connected</h3>
+                    <p>Provider integration comes later</p>
+                </article>
+
+                <article class="status-card">
+                    <span class="card-label">AUTOMATION</span>
+                    <h3>Standby</h3>
+                    <p>No actions running yet</p>
+                </article>
+            </section>
+
+            <section class="assistant-panel">
+                <div class="panel-heading">
+                    <div class="assistant-avatar">N</div>
+                    <div>
+                        <h3>Noxaria Assistant</h3>
+                        <p>Interface online · AI not connected</p>
+                    </div>
+                </div>
+
+                <div class="conversation" id="conversation">
+                    <div class="message assistant-message">
+                        <strong>NOXARIA</strong>
+                        <p>
+                            I'm ready to receive your input.
+                            My intelligence and automation modules
+                            have not been connected yet.
+                        </p>
+                    </div>
+                </div>
+
+                <form class="chat-form" id="chat-form">
+                    {% csrf_token %}
+                    <input
+                        type="text"
+                        id="message-input"
+                        placeholder="Talk to Noxaria..."
+                        autocomplete="off"
+                        required
+                    >
+                    <button type="submit">SEND ↗</button>
+                </form>
+
+                <p class="input-note">
+                    Interface prototype · Messages are not sent to an AI yet
+                </p>
+            </section>
+
+            <footer>NOXARIA © 2026 · BUILT FOR YOUR WORKFLOW</footer>
+        </main>
+    </div>
+
+    <script>
+        const form = document.getElementById("chat-form");
+        const input = document.getElementById("message-input");
+        const conversation = document.getElementById("conversation");
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const message = input.value.trim();
+            if (!message) return;
+
+            const bubble = document.createElement("div");
+            bubble.className = "message user-message";
+
+            const label = document.createElement("strong");
+            label.textContent = "YOU";
+
+            const text = document.createElement("p");
+            text.textContent = message;
+
+            bubble.append(label, text);
+            conversation.appendChild(bubble);
+
+            input.value = "";
+            conversation.scrollTop = conversation.scrollHeight;
+        });
+    </script>
+</body>
+</html>
