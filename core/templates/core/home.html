@@ -1,4 +1,4 @@
-
+﻿
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -20,16 +20,16 @@
             </div>
 
             <p class="section-label">WORKSPACE</p>
-            <button class="nav-item active">◈ &nbsp; Assistant</button>
-            <button class="nav-item">⌘ &nbsp; Applications</button>
-            <button class="nav-item">▤ &nbsp; File Manager</button>
-            <button class="nav-item">◷ &nbsp; Activity Monitor</button>
-            <button class="nav-item">⚙ &nbsp; Settings</button>
+            <button class="nav-item active">â—ˆ &nbsp; Assistant</button>
+            <button class="nav-item">âŒ˜ &nbsp; Applications</button>
+            <button class="nav-item">â–¤ &nbsp; File Manager</button>
+            <button class="nav-item">â—· &nbsp; Activity Monitor</button>
+            <button class="nav-item">âš™ &nbsp; Settings</button>
 
             <div class="sidebar-bottom">
                 <span class="status-dot"></span>
                 Local interface online
-                <small>NOXARIA · BUILD 0.1</small>
+                <small>NOXARIA Â· BUILD 0.1</small>
             </div>
         </aside>
 
@@ -79,7 +79,7 @@
                     <div class="assistant-avatar">N</div>
                     <div>
                         <h3>Noxaria Assistant</h3>
-                        <p>Interface online · AI not connected</p>
+                        <p>Interface online Â· AI not connected</p>
                     </div>
                 </div>
 
@@ -103,44 +103,105 @@
                         autocomplete="off"
                         required
                     >
-                    <button type="submit">SEND ↗</button>
+                    <button type="submit">SEND â†—</button>
                 </form>
 
                 <p class="input-note">
-                    Interface prototype · Messages are not sent to an AI yet
+                    Interface prototype Â· Messages are not sent to an AI yet
                 </p>
             </section>
 
-            <footer>NOXARIA © 2026 · BUILT FOR YOUR WORKFLOW</footer>
+            <footer>NOXARIA Â© 2026 Â· BUILT FOR YOUR WORKFLOW</footer>
         </main>
     </div>
 
     <script>
-        const form = document.getElementById("chat-form");
-        const input = document.getElementById("message-input");
-        const conversation = document.getElementById("conversation");
+    const form = document.getElementById("chat-form");
+    const input = document.getElementById("message-input");
+    const conversation = document.getElementById("conversation");
+    const note = document.querySelector(".input-note");
+    const sendButton = form.querySelector('button[type="submit"]');
+    const csrfInput = form.querySelector('[name="csrfmiddlewaretoken"]');
 
-        form.addEventListener("submit", function (event) {
-            event.preventDefault();
+    function addMessage(sender, message, className) {
+        const bubble = document.createElement("div");
+        bubble.className = "message " + className;
 
-            const message = input.value.trim();
-            if (!message) return;
+        const label = document.createElement("strong");
+        label.textContent = sender;
 
-            const bubble = document.createElement("div");
-            bubble.className = "message user-message";
+        const text = document.createElement("p");
+        text.textContent = message;
 
-            const label = document.createElement("strong");
-            label.textContent = "YOU";
+        bubble.append(label, text);
+        conversation.appendChild(bubble);
+        conversation.scrollTop = conversation.scrollHeight;
 
-            const text = document.createElement("p");
-            text.textContent = message;
+        return text;
+    }
 
-            bubble.append(label, text);
-            conversation.appendChild(bubble);
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-            input.value = "";
+        const message = input.value.trim();
+        if (!message) return;
+
+        addMessage("YOU", message, "user-message");
+        input.value = "";
+        input.focus();
+
+        sendButton.disabled = true;
+        sendButton.textContent = "THINKING...";
+
+        if (note) {
+            note.textContent = "Noxaria is processing your message...";
+        }
+
+        const replyBubble = addMessage(
+            "NOXARIA",
+            "Processing your request...",
+            "assistant-message"
+        );
+
+        try {
+            const response = await fetch("/chat/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfInput.value
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Request failed.");
+            }
+
+            replyBubble.textContent = data.reply;
+
+            if (note) {
+                note.textContent =
+                    "Connected · Intent: " + data.intent +
+                    " · Method: " + data.method;
+            }
+        } catch (error) {
+            replyBubble.textContent = "Connection error: " + error.message;
+
+            if (note) {
+                note.textContent =
+                    "Could not reach the assistant. Check the server terminal.";
+            }
+
+            console.error("Noxaria chat error:", error);
+        } finally {
+            sendButton.disabled = false;
+            sendButton.textContent = "SEND ↗";
             conversation.scrollTop = conversation.scrollHeight;
-        });
-    </script>
+        }
+    });
+</script>
 </body>
 </html>
+
